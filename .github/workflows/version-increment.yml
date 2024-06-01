@@ -3,7 +3,7 @@ name: Version Increment
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
