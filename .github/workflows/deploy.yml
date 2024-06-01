@@ -1,10 +1,9 @@
 name: Deploy Images to Dockerhub
 
 on:
-  workflow_run:
-    workflows: ["Version Increment"]
-    types:
-      - completed
+  push:
+    tags:
+      - "*"
   workflow_dispatch:
 
 
