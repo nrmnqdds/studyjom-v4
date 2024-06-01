@@ -40,3 +40,5 @@ jobs:
             docker login ghcr.io -u nrmnqdds -p ${{ secrets.GHCR_TOKEN }}
             docker compose up --force-recreate --build -d studyjom-webapp
             docker image prune -a -f
+            cat /root/docker-compose.yml
+            docker ps
