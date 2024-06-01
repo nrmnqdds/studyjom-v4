@@ -13,7 +13,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Document, Page, pdfjs } from "react-pdf";
-import { createWorker } from "tesseract.js";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import * as z from "zod";
@@ -48,7 +47,6 @@ const StepTwo = ({ files }: { files: File[] }) => {
 		},
 	});
 
-	// const createNoteMutation = api.note.create.useMutation({
 	const createNoteMutation = useMutation({
 		mutationKey: ["create-note"],
 		mutationFn: async (data: z.infer<typeof UploadNoteSchema>) => {

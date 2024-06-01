@@ -9,7 +9,6 @@ import { type NextRequest, NextResponse } from "next/server";
 // Converts local file information to a GoogleGenerativeAI.Part object.
 async function fileToGenerativePart(url: string, mimeType: string) {
 	const response = await fetch(url);
-	// const buffer = await response.buffer();
 	const buffer = Buffer.from((await response.arrayBuffer()) as ArrayBuffer);
 	return {
 		inlineData: {
@@ -50,8 +49,6 @@ export async function POST(request: NextRequest) {
 	const fileExtension = file.name.split(".").pop();
 	const presignedURL = await uploadFileToS3(buffer, file.name);
 
-	let fileContent: string;
-
 	if (fileExtension === "pdf") {
 		const data = await fetch(
 			`https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
@@ -59,14 +56,14 @@ export async function POST(request: NextRequest) {
 		const buffer = await data.blob();
 		const loader = new PDFLoader(buffer, {
 			parsedItemSeparator: "",
+			splitPages: false,
 		});
 		const rawText = await loader.load();
 		const text = rawText[0]?.pageContent;
-		fileContent = text;
 		return NextResponse.json(
 			{
 				data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-				content: fileContent.trim() || "",
+				content: text.trim() || "",
 			},
 			{
 				status: 201,
