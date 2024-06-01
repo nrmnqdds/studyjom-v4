@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
@@ -13,8 +13,7 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-RUN pnpm i sharp
-
+RUN pnpm add sharp
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app

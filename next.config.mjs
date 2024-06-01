@@ -13,6 +13,10 @@ const nextConfig = {
 		return config;
 	},
 
+	externals: {
+		sharp: "commonjs sharp",
+	},
+
 	images: {
 		remotePatterns: [
 			{
