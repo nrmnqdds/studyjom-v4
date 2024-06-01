@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json(
 			{
 				data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-				content: text.trim() || "",
+				content: text.trim().split(/\s{2,}/) || "",
 			},
 			{
 				status: 201,
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 	return NextResponse.json(
 		{
 			data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-			content: chatResponse.trim() || "",
+			content: chatResponse.trim().split(/\s{2,}/) || "",
 		},
 		{
 			status: 201,
