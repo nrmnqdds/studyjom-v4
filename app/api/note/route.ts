@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
 					title: notes.title,
 					desc: notes.desc,
 					subject_name: notes.subject_name,
+					file_url: notes.file_url,
 				})
 				.from(notes)
 				.where(eq(notes.is_verified, false));
@@ -73,6 +74,7 @@ export async function GET(request: NextRequest) {
 					title: notes.title,
 					desc: notes.desc,
 					subject_name: notes.subject_name,
+					file_url: notes.file_url,
 				})
 				.from(notes)
 				.where(eq(notes.is_verified, true));
@@ -85,6 +87,7 @@ export async function GET(request: NextRequest) {
 					title: notes.title,
 					desc: notes.desc,
 					subject_name: notes.subject_name,
+					file_url: notes.file_url,
 				})
 				.from(notes);
 			return NextResponse.json({ data: all_notes }, { status: 200 });
