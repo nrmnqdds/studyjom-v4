@@ -16,8 +16,6 @@ export async function POST(request: NextRequest) {
 				author_id: body.authorId,
 				file_url: body.fileURL,
 				file_content: body.fileContent,
-				up_votes: [],
-				down_votes: [],
 				is_verified: false,
 			})
 			.returning({ returningId: notes.id });
