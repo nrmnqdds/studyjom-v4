@@ -1,9 +1,23 @@
+import { genAI } from "@/lib/gemini";
+import { logger } from "@/lib/logger";
 import { r2Client } from "@/lib/r2";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { createId } from "@paralleldrive/cuid2";
 import { type NextRequest, NextResponse } from "next/server";
-import { createWorker } from "tesseract.js";
+
+// Converts local file information to a GoogleGenerativeAI.Part object.
+async function fileToGenerativePart(url: string, mimeType: string) {
+	const response = await fetch(url);
+	// const buffer = await response.buffer();
+	const buffer = Buffer.from((await response.arrayBuffer()) as ArrayBuffer);
+	return {
+		inlineData: {
+			data: buffer.toString("base64"),
+			mimeType,
+		},
+	};
+}
 
 async function uploadFileToS3(file: Buffer, fileName: string) {
 	const fileBuffer = file;
@@ -36,7 +50,7 @@ export async function POST(request: NextRequest) {
 	const fileExtension = file.name.split(".").pop();
 	const presignedURL = await uploadFileToS3(buffer, file.name);
 
-	let content: string;
+	let fileContent: string;
 
 	if (fileExtension === "pdf") {
 		const data = await fetch(
@@ -48,20 +62,36 @@ export async function POST(request: NextRequest) {
 		});
 		const rawText = await loader.load();
 		const text = rawText[0]?.pageContent;
-		content = text;
-	} else {
-		const worker = await createWorker("eng");
-		const ret = await worker.recognize(
-			`https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
+		fileContent = text;
+		return NextResponse.json(
+			{
+				data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
+				content: fileContent.trim() || "",
+			},
+			{
+				status: 201,
+			},
 		);
-		content = ret.data.text;
-		await worker.terminate();
 	}
+	// The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
+	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+	const prompt =
+		"Extract all text from the image and convert it into a plain text format. Make sure to do not leave whitespaces.";
+
+	const imagePart = await fileToGenerativePart(
+		`https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
+		"image/*",
+	);
+
+	const result = await model.generateContent([prompt, imagePart]);
+	const chatResponse = result?.response?.text();
+	logger.info(`chatResponse: ${chatResponse}`);
 
 	return NextResponse.json(
 		{
 			data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-			content: content,
+			content: chatResponse.trim() || "",
 		},
 		{
 			status: 201,

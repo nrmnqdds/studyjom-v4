@@ -28,72 +28,63 @@ export async function POST(request: NextRequest) {
 		geolocation: "",
 	});
 
-	try {
-		const user = await db
-			.select()
-			.from(users)
-			.where(eq(users.matric_no, body.username));
+	const user = await db
+		.select()
+		.from(users)
+		.where(eq(users.matric_no, body.username));
 
-		if (user) {
-			const isPasswordValid = await bcrypt.compare(
-				body.password,
-				user[0]?.password as string,
-			);
+	if (user.length > 0) {
+		logger.info("User is in database. Proceed to use existing data.");
+		const isPasswordValid = await bcrypt.compare(
+			body.password,
+			user[0]?.password as string,
+		);
 
-			if (!isPasswordValid) {
-				return NextResponse.json(
-					{
-						error: "Invalid username or password",
-					},
-					{
-						status: 401,
-					},
-				);
-			}
-
-			const myCipher = cipher(process.env.NEXT_PUBLIC_JWT_SECRET);
-			const encryptedData = myCipher(
-				btoa(JSON.stringify(user).split("").reverse().join("")),
-			);
-
-			const token = await new jose.SignJWT({
-				username: body.username,
-				today,
-			})
-				.setProtectedHeader({ alg: "HS256" })
-				.setIssuedAt(new Date())
-				.setJti(createId())
-				.setIssuer("studyjom")
-				.setExpirationTime("31d")
-				.setSubject(encryptedData)
-				.sign(new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET));
-
-			cookies().set({
-				name: "studyjom-session",
-				value: token,
-				httpOnly: true,
-				secure: true,
-				sameSite: "strict",
-				path: "/",
-				maxAge: 2678400,
-			});
-
+		if (!isPasswordValid) {
+			logger.error("User is in database. Invalid username or password");
 			return NextResponse.json(
 				{
-					data: user[0],
+					error: "Invalid username or password",
 				},
 				{
-					status: 200,
+					status: 401,
 				},
 			);
 		}
-	} catch (err) {
+
+		const myCipher = cipher(process.env.NEXT_PUBLIC_JWT_SECRET);
+		const encryptedData = myCipher(
+			btoa(JSON.stringify(user).split("").reverse().join("")),
+		);
+
+		const token = await new jose.SignJWT({
+			username: body.username,
+			today,
+		})
+			.setProtectedHeader({ alg: "HS256" })
+			.setIssuedAt(new Date())
+			.setJti(createId())
+			.setIssuer("studyjom")
+			.setExpirationTime("31d")
+			.setSubject(encryptedData)
+			.sign(new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET));
+
+		cookies().set({
+			name: "studyjom-session",
+			value: token,
+			httpOnly: true,
+			secure: true,
+			sameSite: "strict",
+			path: "/",
+			maxAge: 2678400,
+		});
+
 		return NextResponse.json(
 			{
-				error: "Invalid username or password",
+				data: user[0],
 			},
 			{
-				status: 401,
+				status: 200,
 			},
 		);
 	}
@@ -127,6 +118,7 @@ export async function POST(request: NextRequest) {
 		const cookieStore = cookieJar.toJSON().cookies;
 
 		if (cookieStore.length === 0) {
+			logger.error("No cookie retrieved");
 			return NextResponse.json(
 				{
 					error: "Invalid username or password",
@@ -144,6 +136,7 @@ export async function POST(request: NextRequest) {
 		});
 
 		if (!response.ok) {
+			logger.error("Can't get into imaluum home page");
 			return NextResponse.json(
 				{
 					error: "Internal Server Error",
@@ -159,21 +152,9 @@ export async function POST(request: NextRequest) {
 			".navbar-custom-menu ul.nav.navbar-nav li.dropdown.user.user-menu span.hidden-xs",
 		);
 
-		if (!hiddenTextSelector) {
-			// Check if the selectors were found
-			return NextResponse.json(
-				{
-					error: "Internal Server Error",
-				},
-				{
-					status: 500,
-				},
-			);
-		}
-
 		const imageURL = `https://corsproxy.io/?https://smartcard.iium.edu.my/packages/card/printing/camera/uploads/original/${body.username}.jpeg`;
 		const name =
-			hiddenTextSelector.textContent?.trim().replace(/\s+/g, " ") ?? "";
+			hiddenTextSelector?.textContent?.trim().replace(/\s+/g, " ") ?? "";
 
 		const hashedPassword = await bcrypt.hash(body.password, 10);
 
@@ -185,7 +166,14 @@ export async function POST(request: NextRequest) {
 				password: hashedPassword,
 				image_url: imageURL,
 			})
-			.returning();
+			.returning({
+				id: users.id,
+				full_name: users.full_name,
+				matric_no: users.matric_no,
+				image_url: users.image_url,
+				points: users.points,
+			});
+		logger.info("User created successfully");
 
 		const myCipher = cipher(process.env.NEXT_PUBLIC_JWT_SECRET);
 		const encryptedData = myCipher(
@@ -223,6 +211,7 @@ export async function POST(request: NextRequest) {
 			},
 		);
 	} catch (error) {
+		logger.error("Internal Server Error");
 		return NextResponse.json(
 			{
 				error: "Internal Server Error",

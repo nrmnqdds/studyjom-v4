@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Document, Page, pdfjs } from "react-pdf";
+import { createWorker } from "tesseract.js";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import * as z from "zod";
@@ -91,15 +92,17 @@ const StepTwo = ({ files }: { files: File[] }) => {
 			});
 
 			const json = await res.json();
-			return json.data;
+			return json;
 		},
 		onSuccess: async (data) => {
-			toast.loading("Extracting text from file...");
+			console.log("data: ", data);
 
 			if (!data.content) {
 				toast.dismiss();
+				setIsLoading(false);
 				return toast.error("Error extracting text from file");
 			}
+
 			return await createNoteMutation.mutateAsync({
 				...form.getValues(),
 				fileURL: data.data,
@@ -115,8 +118,10 @@ const StepTwo = ({ files }: { files: File[] }) => {
 		},
 	});
 
-	const onSubmit = async () => {
+	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		setIsLoading(true);
+		toast.loading("Uploading file...");
 		await uploadMutation.mutateAsync();
 	};
 
@@ -160,10 +165,7 @@ const StepTwo = ({ files }: { files: File[] }) => {
 					</div>
 				</div>
 				<div className="flex-1 flex items-center justify-center">
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="space-y-5 w-1/2"
-					>
+					<form onSubmit={onSubmit} className="space-y-5 w-1/2">
 						<div>
 							<label htmlFor="title" className="text-black">
 								Title

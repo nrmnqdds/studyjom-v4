@@ -35,7 +35,7 @@ const aiConfig = {
 	},
 };
 
-const genAI = new GoogleGenerativeAI(aiConfig.gemini.apiKey);
+export const genAI = new GoogleGenerativeAI(aiConfig.gemini.apiKey);
 
 const QA_TEMPLATE = `You are a helpful AI assistant. Use the following pieces of context to answer the question at the end.
 If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
