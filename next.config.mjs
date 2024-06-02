@@ -13,10 +13,6 @@ const nextConfig = {
 		return config;
 	},
 
-	externals: {
-		sharp: "commonjs sharp",
-	},
-
 	images: {
 		remotePatterns: [
 			{
@@ -28,6 +24,12 @@ const nextConfig = {
 				hostname: "r2.studyjom.nrmnqdds.com",
 			},
 		],
+	},
+
+	logging: {
+		fetches: {
+			fullUrl: true,
+		},
 	},
 };
 

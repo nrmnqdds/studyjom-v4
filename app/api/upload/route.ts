@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
 	const file = body.get("file") as File;
 
 	const buffer = Buffer.from((await file.arrayBuffer()) as ArrayBuffer);
-	const fileExtension = file.name.split(".").pop();
 	const presignedURL = await uploadFileToS3(buffer, file.name);
+	const fileExtension = file.name.split(".").pop();
 
 	if (fileExtension === "pdf") {
 		const data = await fetch(

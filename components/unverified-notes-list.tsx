@@ -36,14 +36,7 @@ const UnverifiedNotes = () => {
 			{isFetching ? (
 				<>
 					{Array.from({ length: 5 }).map((_, index) => (
-						<div
-							key={index}
-							className="w-1/5 flex flex-col gap-0.5 bg-green-800 border-2 border-black shadow-default p-2"
-						>
-							<Skeleton className="h-10 w-10" />
-							<Skeleton className="h-10 w-10" />
-							<Skeleton className="h-10 w-10" />
-						</div>
+						<Skeleton key={index} className="w-1/5 h-60" />
 					))}
 				</>
 			) : (
