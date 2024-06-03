@@ -87,3 +87,26 @@ export const commentAuthor = relations(comments, ({ one }) => ({
 		references: [notes.id],
 	}),
 }));
+
+export const chatSessions = pgTable("chat_sessions", {
+	id: text("id").primaryKey().$defaultFn(createId),
+	user_id: text("user_id").notNull(),
+	note_id: text("note_id").notNull(),
+	created_at: date("created_at")
+		.notNull()
+		.$defaultFn(() => new Date().toISOString()),
+});
+
+export const userChats = relations(users, ({ one }) => ({
+	chatSessions: one(chatSessions, {
+		fields: [users.id],
+		references: [chatSessions.user_id],
+	}),
+}));
+
+export const noteChats = relations(notes, ({ one }) => ({
+	chatSession: one(chatSessions, {
+		fields: [notes.id],
+		references: [chatSessions.note_id],
+	}),
+}));
