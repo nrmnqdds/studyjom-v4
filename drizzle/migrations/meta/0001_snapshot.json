@@ -1,6 +1,6 @@
 {
-  "id": "a37e546e-035d-4012-9c7e-3effc097b93a",
-  "prevId": "2ab29459-5b3d-46f0-ab20-9e46621eaaad",
+  "id": "e2e2ba80-98d9-4b02-86ba-1a48c02fb71e",
+  "prevId": "d2a7e1b9-581b-4233-b4c5-dd87b685201b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -213,9 +213,15 @@
         },
         "points": {
           "name": "points",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "credits": {
+          "name": "credits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",

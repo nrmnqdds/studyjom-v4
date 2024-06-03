@@ -44,14 +44,7 @@ const DynamicNoteContent = ({ id }: { id: string }) => {
 			</header>
 			<div className="flex-1 grid grid-cols-3 gap-6 p-6">
 				<div className="col-span-2 bg-gray-100 rounded-lg overflow-hidden">
-					{/* <img
-						src="/placeholder.svg"
-						alt="Document Image"
-						width={1200}
-						height={800}
-						className="w-full h-full object-contain"
-					/> */}
-					<div className="w-full relative h-full overflow-hidden transform transition-transform hover:scale-105 cursor-pointer">
+					<div className="w-full relative h-full overflow-hidden">
 						{note.file_url.split(".").pop === "pdf" ? (
 							<Document file={note.file_url}>
 								<Page pageNumber={1} />
@@ -70,24 +63,18 @@ const DynamicNoteContent = ({ id }: { id: string }) => {
 					<Button
 						className="w-full"
 						onClick={async () => {
-							const res = await fetch("/api/note/download", {
-								method: "POST",
-								headers: {
-									"Content-Type": "application/json",
-								},
-								body: JSON.stringify({ filename: note.file_name }),
-							});
-							// return res.blob();
+							const res = await fetch(note.file_url);
 							const blob = await res.blob();
 							const url = URL.createObjectURL(blob);
 							const a = document.createElement("a");
 							a.href = url;
-							a.download = note.file_name;
+							a.download = note.file_url;
 							a.click();
 						}}
 					>
 						Download
 					</Button>
+					{/* 					<pre>{JSON.stringify(note, null, 2)}</pre> */}
 					<ScrollArea className="bg-purple-200 rounded-lg p-4 flex-1">
 						<div className="space-y-4">
 							<div className="flex items-start gap-4">

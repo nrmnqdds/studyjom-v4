@@ -1,19 +1,19 @@
 {
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1716500566797,
-      "tag": "0000_good_kronos",
+      "version": "7",
+      "when": 1717404485739,
+      "tag": "0000_reflective_dust",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1717232164272,
-      "tag": "0001_careful_groot",
+      "when": 1717404530152,
+      "tag": "0001_nappy_jubilee",
       "breakpoints": true
     }
   ]

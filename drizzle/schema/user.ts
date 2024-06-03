@@ -3,8 +3,8 @@ import { relations } from "drizzle-orm";
 import {
 	boolean,
 	date,
+	integer,
 	pgTable,
-	serial,
 	text,
 	varchar,
 } from "drizzle-orm/pg-core";
@@ -15,7 +15,8 @@ export const users = pgTable("users", {
 	matric_no: varchar("matric_no", { length: 50 }).notNull(),
 	password: text("password").notNull(),
 	image_url: text("image_url").notNull(),
-	points: serial("points").notNull(),
+	points: integer("points").$defaultFn(() => 0),
+	credits: integer("credits").$defaultFn(() => 0),
 	created_at: date("created_at")
 		.notNull()
 		.$defaultFn(() => new Date().toISOString()),
