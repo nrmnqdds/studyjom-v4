@@ -1,15 +1,19 @@
+import fs from "node:fs";
 import data from "../public/data.json";
 
 const subjectFilter = (data) => {
-	for (let i = 0; i <= data.length; i++) {
-		for (let j = i + 1; j <= data.length; j++) {
-			if (data[i].code !== undefined && data[j].code !== undefined) {
-				if (data[i].code === data[j].code) {
-					console.log(data[i].code);
-				}
-			}
-		}
-	}
+	const clean = data.filter(
+		(data, index, self) =>
+			index === self.findIndex((t) => t.code === data.code),
+	);
+
+	const filteredData = clean.map((item) => ({
+		code: item.code,
+		title: item.title,
+	}));
+
+	// console.log(clean);
+	fs.writeFileSync("public/data.json", JSON.stringify(filteredData, null, 2));
 };
 
 subjectFilter(data);

@@ -18,6 +18,9 @@ async function fileToGenerativePart(url: string, mimeType: string) {
 	};
 }
 
+// The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 async function uploadFileToS3(file: Buffer, fileName: string) {
 	const fileBuffer = file;
 
@@ -46,13 +49,13 @@ export async function POST(request: NextRequest) {
 	const file = body.get("file") as File;
 
 	const buffer = Buffer.from((await file.arrayBuffer()) as ArrayBuffer);
-	const presignedURL = await uploadFileToS3(buffer, file.name);
+	const newFileName = await uploadFileToS3(buffer, file.name);
 	const fileExtension = file.name.split(".").pop();
 
+	const presignedURL = `https://r2.studyjom.nrmnqdds.com/${newFileName}`;
+
 	if (fileExtension === "pdf") {
-		const data = await fetch(
-			`https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-		);
+		const data = await fetch(presignedURL);
 		const buffer = await data.blob();
 		const loader = new PDFLoader(buffer, {
 			parsedItemSeparator: "",
@@ -60,35 +63,50 @@ export async function POST(request: NextRequest) {
 		});
 		const rawText = await loader.load();
 		const text = rawText[0]?.pageContent;
+
+		const prompt =
+			"Create a summary of this whole context, so that another chat instace could understand the summary and context, with compression. Make sure to do not leave whitespaces.";
+
+		const result = await model.generateContent([prompt, text]);
+		const chatResponse = JSON.stringify(
+			result?.response
+				?.text()
+				.trim()
+				.split(/\s{2,}/),
+		)
+			.replace(/((^")|("$))/g, "")
+			.trim();
+
 		return NextResponse.json(
 			{
-				data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-				content: text.trim().split(/\s{2,}/) || "",
+				data: presignedURL,
+				content: chatResponse || "",
 			},
 			{
 				status: 201,
 			},
 		);
 	}
-	// The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
-	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 	const prompt =
-		"Extract all text from the image and convert it into a plain text format. Make sure to do not leave whitespaces.";
+		"Extract all text from the image and convert it into a plain text format. Create a summary of this whole context, so that another chat instace could understand the summary and context, with compression. Make sure to do not leave whitespaces.";
 
-	const imagePart = await fileToGenerativePart(
-		`https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-		"image/*",
-	);
+	const imagePart = await fileToGenerativePart(presignedURL, "image/*");
 
 	const result = await model.generateContent([prompt, imagePart]);
-	const chatResponse = result?.response?.text();
-	logger.info(`chatResponse: ${chatResponse}`);
+	const chatResponse = JSON.stringify(
+		result?.response
+			?.text()
+			.trim()
+			.split(/\s{2,}/),
+	)
+		.replace(/((^")|("$))/g, "")
+		.trim();
 
 	return NextResponse.json(
 		{
-			data: `https://r2.studyjom.nrmnqdds.com/${presignedURL}`,
-			content: chatResponse.trim().split(/\s{2,}/) || "",
+			data: presignedURL,
+			content: chatResponse || "",
 		},
 		{
 			status: 201,

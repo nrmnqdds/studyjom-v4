@@ -38,9 +38,7 @@ const DynamicNotePage = async ({ params }: Props) => {
 	return (
 		<Suspense fallback={<div>Loading...</div>}>
 			<HydrationBoundary state={dehydrate(queryClient)}>
-				<div className="h-auto w-full">
-					<DynamicNoteContent id={params.id} />
-				</div>
+				<DynamicNoteContent id={params.id} />
 			</HydrationBoundary>
 		</Suspense>
 	);

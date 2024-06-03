@@ -38,14 +38,14 @@ const DynamicNoteContent = ({ id }: { id: string }) => {
 	return isFetching ? (
 		<div>Loading...</div>
 	) : (
-		<div className="flex flex-col">
+		<div className="w-full h-full relative flex flex-col">
 			<header className="bg-green-900 text-white py-4 px-6 rounded-2xl">
 				<h1 className="text-2xl font-bold">{note.title}</h1>
 			</header>
 			<div className="flex-1 grid grid-cols-3 gap-6 p-6">
-				<div className="col-span-2 bg-gray-100 rounded-lg overflow-hidden">
-					<div className="w-full relative h-full overflow-hidden">
-						{note.file_url.split(".").pop === "pdf" ? (
+				<div className="col-span-2 relative bg-gray-100 rounded-lg overflow-hidden">
+					<div className="w-full absolute h-full ">
+						{note.file_url.split(".").pop() === "pdf" ? (
 							<Document file={note.file_url}>
 								<Page pageNumber={1} />
 							</Document>
@@ -74,7 +74,6 @@ const DynamicNoteContent = ({ id }: { id: string }) => {
 					>
 						Download
 					</Button>
-					{/* 					<pre>{JSON.stringify(note, null, 2)}</pre> */}
 					<ScrollArea className="bg-purple-200 rounded-lg p-4 flex-1">
 						<div className="space-y-4">
 							<div className="flex items-start gap-4">
