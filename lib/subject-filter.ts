@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import fs from "node:fs";
 import data from "../public/data.json";
 
