@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cache } from "react";
 
 function makeQueryClient() {
 	return new QueryClient({
@@ -18,7 +17,7 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
-const getQueryClient = cache(() => {
+const getQueryClient = () => {
 	if (typeof window === "undefined") {
 		// Server: always make a new query client
 		return makeQueryClient();
@@ -29,7 +28,7 @@ const getQueryClient = cache(() => {
 	// have a suspense boundary BELOW the creation of the query client
 	if (!browserQueryClient) browserQueryClient = makeQueryClient();
 	return browserQueryClient;
-});
+};
 
 const QueryProvider = ({ children }: { children: React.ReactNode }) => {
 	const queryClient = getQueryClient();

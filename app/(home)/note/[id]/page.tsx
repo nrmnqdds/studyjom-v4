@@ -1,4 +1,3 @@
-import { constant } from "@/constants";
 import {
 	HydrationBoundary,
 	QueryClient,
@@ -15,7 +14,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const id = params.id;
 
-	const res = await fetch(`${constant.BACKEND_URL}/note/${id}`);
+	const res = await fetch(`https://studyjom.nrmnqdds.com/api/note/${id}`);
 	const data = await res.json();
 
 	return {
@@ -30,7 +29,7 @@ const DynamicNotePage = async ({ params }: Props) => {
 		queryKey: ["posts"],
 		queryFn: async () => {
 			const res = await fetch(
-				`https://studyjom.nrmnqdds.com/notes/${params.id}`,
+				`https://studyjom.nrmnqdds.com/api/notes/${params.id}`,
 			);
 			const json = await res.json();
 			return json.data;

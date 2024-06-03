@@ -24,6 +24,10 @@ jobs:
           username: nrmnqdds
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: 'Update version in footer'
+        run: |
+          sed -i "s/APP_VERSION: '.*'/APP_VERSION: '${{ github.ref_name }}'/g" constants/index.ts
+
       - name: 'Build Inventory Image'
         run: |
           docker build . --tag ghcr.io/nrmnqdds/studyjom-webapp:${{ github.ref_name }}
