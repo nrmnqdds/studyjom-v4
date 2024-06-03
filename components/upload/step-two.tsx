@@ -5,7 +5,6 @@ import { Input } from "@/components/default/input";
 import SubjectsCombobox from "@/components/default/subjects-combobox";
 import { useSession } from "@/hooks/use-session";
 import { formatBytes } from "@/lib/format";
-import { logger } from "@/lib/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
@@ -72,7 +71,7 @@ const StepTwo = ({ files }: { files: File[] }) => {
 		onError: (error) => {
 			setIsLoading(false);
 			toast.dismiss();
-			logger.error(error.message);
+			console.log(error.message);
 			toast.error("Error creating post");
 		},
 	});
@@ -94,8 +93,6 @@ const StepTwo = ({ files }: { files: File[] }) => {
 			return json;
 		},
 		onSuccess: async (data) => {
-			logger.info("data: ", data);
-
 			if (!data.content) {
 				toast.dismiss();
 				setIsLoading(false);
@@ -112,7 +109,7 @@ const StepTwo = ({ files }: { files: File[] }) => {
 		onError: (error) => {
 			setIsLoading(false);
 			toast.dismiss();
-			logger.error(error.message);
+			console.log(error);
 			toast.error("Error uploading files");
 		},
 	});
