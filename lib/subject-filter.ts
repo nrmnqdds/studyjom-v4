@@ -14,7 +14,6 @@ const subjectFilter = (data) => {
 		title: item.title,
 	}));
 
-	// console.log(clean);
 	fs.writeFileSync("public/data.json", JSON.stringify(filteredData, null, 2));
 };
 

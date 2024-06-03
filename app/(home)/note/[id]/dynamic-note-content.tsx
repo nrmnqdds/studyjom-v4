@@ -29,7 +29,7 @@ const DynamicNoteContent = ({ id }: { id: string }) => {
 	const { data: note, isFetching } = useQuery({
 		queryKey: ["note"],
 		queryFn: async () => {
-			const res = await fetch(`${constant.BACKEND_URL}/note/${id}`);
+			const res = await fetch(`https://studyjom.nrmnqdds.com/note/${id}`);
 			const json = await res.json();
 			return json.data;
 		},

@@ -149,7 +149,7 @@ export default function StickerPlanes({ MouseMovement }) {
 				>
 					<Image
 						className="inline-block align-middle"
-						src={"/StickersWithColor/Chef's hat Sticker.png"}
+						src={"/StickersWithColor/Chefs hat Sticker.png"}
 						height={300}
 						width={300}
 						alt="Chef's-Hat-sticker"

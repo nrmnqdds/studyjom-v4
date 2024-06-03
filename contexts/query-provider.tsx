@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { cache } from "react";
 
 function makeQueryClient() {
 	return new QueryClient({
@@ -9,6 +10,7 @@ function makeQueryClient() {
 				// With SSR, we usually want to set some default staleTime
 				// above 0 to avoid refetching immediately on the client
 				staleTime: 60 * 1000,
+				refetchOnWindowFocus: false,
 			},
 		},
 	});
@@ -16,7 +18,7 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 
-function getQueryClient() {
+const getQueryClient = cache(() => {
 	if (typeof window === "undefined") {
 		// Server: always make a new query client
 		return makeQueryClient();
@@ -27,7 +29,7 @@ function getQueryClient() {
 	// have a suspense boundary BELOW the creation of the query client
 	if (!browserQueryClient) browserQueryClient = makeQueryClient();
 	return browserQueryClient;
-}
+});
 
 const QueryProvider = ({ children }: { children: React.ReactNode }) => {
 	const queryClient = getQueryClient();
