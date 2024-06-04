@@ -11,5 +11,5 @@ export const constant = {
 
 	IMALUUM_RESULT_PAGE: "https://imaluum.iium.edu.my/MyAcademic/result",
 
-	APP_VERSION: "v0.0.21",
+	APP_VERSION: "0.1.1",
 };

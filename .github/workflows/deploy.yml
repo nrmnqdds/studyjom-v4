@@ -26,7 +26,7 @@ jobs:
 
       - name: 'Update version in footer'
         run: |
-          sed -i "s/APP_VERSION: '.*'/APP_VERSION: '${{ github.ref_name }}'/g" ./constants/index.ts
+          sed -i 's/APP_VERSION: ".*"/APP_VERSION: "${{ github.ref_name }}"/g' ./constants/index.ts
           cat ./constants/index.ts
 
       - name: 'Build Inventory Image'
