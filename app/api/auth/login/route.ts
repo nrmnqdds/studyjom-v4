@@ -1,7 +1,7 @@
 import { constant } from "@/constants";
 import { db } from "@/drizzle";
 import { users } from "@/drizzle/schema/user";
-import { cipher } from "@/lib/cipher";
+import { cipher, decipher } from "@/lib/cipher";
 import { logger } from "@/lib/logger";
 import { redisClient } from "@/lib/redis";
 import { createId } from "@paralleldrive/cuid2";
@@ -257,6 +257,50 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE() {
+	const token = cookies().get("studyjom-session");
+
+	if (!token || !token.value) {
+		return NextResponse.json(
+			{
+				error: "Unauthorized",
+			},
+			{
+				status: 401,
+			},
+		);
+	}
+
+	const { payload } = await jose.jwtVerify(
+		token.value,
+		new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET),
+		{
+			issuer: "studyjom",
+			algorithms: ["HS256"],
+		},
+	);
+
+	if (!payload) {
+		cookies().delete("studyjom-session");
+		return NextResponse.json(
+			{
+				error: "Unauthorized",
+			},
+			{
+				status: 401,
+			},
+		);
+	}
+
+	const myDecipher = decipher(process.env.NEXT_PUBLIC_JWT_SECRET as string);
+
+	const namespace = JSON.parse(
+		atob(myDecipher(payload.sub)).split("").reverse().join(""),
+	);
+
+	logger.info(`namespace from cookie: ${namespace}`);
+
+	await redisClient.del(namespace);
+
 	cookies().delete("studyjom-session");
 
 	return NextResponse.json(

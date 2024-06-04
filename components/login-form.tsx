@@ -25,6 +25,7 @@ const formSchema = z.object({
 
 const LoginForm = ({ className }: { className?: string }) => {
 	const [open, setOpen] = useState(false);
+	const { refetch } = useSession();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -45,6 +46,11 @@ const LoginForm = ({ className }: { className?: string }) => {
 			if (data.error) {
 				throw new Error(data.error);
 			}
+			await refetch();
+			if (!data.data) {
+				return null;
+			}
+			return data.data;
 		},
 	});
 
