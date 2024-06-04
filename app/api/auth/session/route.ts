@@ -1,9 +1,6 @@
-import { db } from "@/drizzle";
-import { users } from "@/drizzle/schema/user";
 import { decipher } from "@/lib/cipher";
 import { logger } from "@/lib/logger";
-import type { TUser } from "@/schema/types/user";
-import { eq } from "drizzle-orm";
+import { redisClient } from "@/lib/redis";
 import * as jose from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -11,7 +8,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
 	const token = cookies().get("studyjom-session");
 
-	if (!token) {
+	if (!token || !token.value) {
 		return NextResponse.json(
 			{
 				error: "Unauthorized",
@@ -45,13 +42,13 @@ export async function GET() {
 
 	const myDecipher = decipher(process.env.NEXT_PUBLIC_JWT_SECRET as string);
 
-	const session: TUser = JSON.parse(
+	const namespace = JSON.parse(
 		atob(myDecipher(payload.sub)).split("").reverse().join(""),
 	);
 
-	logger.info("session from cookie: ", session);
+	logger.info(`namespace from cookie: ${namespace}`);
 
-	if (!session) {
+	if (!namespace) {
 		cookies().delete("studyjom-session");
 		return NextResponse.json(
 			{
@@ -63,9 +60,11 @@ export async function GET() {
 		);
 	}
 
-	const user = await db.select().from(users).where(eq(users.id, session.id));
+	const session = await redisClient.hgetall(namespace);
 
-	if (user.length === 0) {
+	// const user = await db.select().from(users).where(eq(users.id, session.id));
+
+	if (!session || Object.keys(session).length === 0) {
 		cookies().delete("studyjom-session");
 		return NextResponse.json(
 			{
@@ -77,5 +76,5 @@ export async function GET() {
 		);
 	}
 
-	return NextResponse.json({ data: user[0] }, { status: 200 });
+	return NextResponse.json({ data: session }, { status: 200 });
 }

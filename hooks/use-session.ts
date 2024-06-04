@@ -1,12 +1,14 @@
-import type { TUser } from "@/schema/types/user";
-import { create } from "zustand";
+import { useQuery } from "@tanstack/react-query";
 
-type SessionStore = {
-	session: TUser | undefined;
-	setSession: (session: TUser | undefined) => void;
+export const useSession = () => {
+	const data = useQuery({
+		queryKey: ["session"],
+		queryFn: async () => {
+			const res = await fetch("/api/auth/session");
+			const json = await res.json();
+			return json.data;
+		},
+	});
+
+	return { ...data, session: data.data };
 };
-
-export const useSession = create<SessionStore>((set) => ({
-	session: undefined,
-	setSession: (session) => set({ session }),
-}));

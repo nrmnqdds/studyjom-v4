@@ -3,6 +3,7 @@ import { db } from "@/drizzle";
 import { users } from "@/drizzle/schema/user";
 import { cipher } from "@/lib/cipher";
 import { logger } from "@/lib/logger";
+import { redisClient } from "@/lib/redis";
 import { createId } from "@paralleldrive/cuid2";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
@@ -18,16 +19,20 @@ const today = new Date().toISOString();
 export async function POST(request: NextRequest) {
 	const body = await request.json();
 
-	const cookieJar = new CookieJar();
+	const userRedis = await redisClient.hgetall(`session-${body.username}`);
 
-	const payload = new URLSearchParams({
-		username: body.username,
-		password: body.password,
-		execution: "e1s1",
-		_eventId: "submit",
-		geolocation: "",
-	});
-
+	if (Object.keys(userRedis).length !== 0) {
+		logger.info("User is in redis. Proceed to use existing data.");
+		logger.info(userRedis);
+		return NextResponse.json(
+			{
+				data: userRedis,
+			},
+			{
+				status: 200,
+			},
+		);
+	}
 	const user = await db
 		.select()
 		.from(users)
@@ -52,9 +57,19 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
+		const namespace = `session-${user[0].id}`;
+
+		try {
+			const setHash = await redisClient.hset(namespace, user[0]);
+			logger.info(setHash);
+		} catch (e) {
+			logger.error("Error setting session in redis");
+		}
+		logger.info("Session set in redis");
+
 		const myCipher = cipher(process.env.NEXT_PUBLIC_JWT_SECRET);
 		const encryptedData = myCipher(
-			btoa(JSON.stringify(user).split("").reverse().join("")),
+			btoa(JSON.stringify(namespace).split("").reverse().join("")),
 		);
 
 		const token = await new jose.SignJWT({
@@ -92,6 +107,15 @@ export async function POST(request: NextRequest) {
 	logger.info("No user found, proceed to login");
 
 	try {
+		const cookieJar = new CookieJar();
+
+		const payload = new URLSearchParams({
+			username: body.username,
+			password: body.password,
+			execution: "e1s1",
+			_eventId: "submit",
+			geolocation: "",
+		});
 		await got(constant.IMALUUM_CAS_PAGE, {
 			cookieJar,
 			https: { rejectUnauthorized: false },
@@ -175,9 +199,18 @@ export async function POST(request: NextRequest) {
 			});
 		logger.info("User created successfully");
 
+		const namespace = `session-${user[0].id}`;
+		try {
+			const setHash = await redisClient.hset(namespace, user[0]);
+			logger.info(setHash);
+		} catch (e) {
+			logger.error("Error setting session in redis");
+		}
+		logger.info("Session set in redis");
+
 		const myCipher = cipher(process.env.NEXT_PUBLIC_JWT_SECRET);
 		const encryptedData = myCipher(
-			btoa(JSON.stringify(user[0]).split("").reverse().join("")),
+			btoa(JSON.stringify(namespace).split("").reverse().join("")),
 		);
 
 		const token = await new jose.SignJWT({
@@ -204,7 +237,7 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json(
 			{
-				data: user[0],
+				data: user[0].id,
 			},
 			{
 				status: 200,

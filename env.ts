@@ -25,6 +25,8 @@ const envVariables = z.object({
 
 	// NEXT_TELEMETRY_DISABLED
 	NEXT_TELEMETRY_DISABLED: z.coerce.number().int(),
+
+	REDIS_URL: z.string(),
 });
 
 envVariables.parse(process.env);

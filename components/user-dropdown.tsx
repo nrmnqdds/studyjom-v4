@@ -20,7 +20,7 @@ import { Fragment } from "react";
 import toast from "react-hot-toast";
 
 const UserDropdown = () => {
-	const { setSession, session } = useSession();
+	const { session } = useSession();
 	const router = useRouter();
 
 	const logoutMutation = useMutation({
@@ -29,7 +29,6 @@ const UserDropdown = () => {
 			await fetch("/api/auth/login", {
 				method: "DELETE",
 			});
-			setSession(undefined);
 			router.push("/");
 		},
 	});

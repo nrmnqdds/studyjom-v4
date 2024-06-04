@@ -1,24 +1,9 @@
 "use client";
 
 import { useSession } from "@/hooks/use-session";
-import { useQuery } from "@tanstack/react-query";
 
 const SessionProvider = ({ children }: { children: React.ReactNode }) => {
-	const { setSession } = useSession();
-
-	const { isFetching } = useQuery({
-		queryKey: ["fetchSession"],
-		queryFn: async () => {
-			const res = await fetch("/api/auth/session");
-			const data = await res.json();
-			if (data.error) {
-				setSession(undefined);
-			}
-			setSession(data.data);
-		},
-		refetchOnWindowFocus: false,
-		retry: 2,
-	});
+	const { isFetching } = useSession();
 
 	return isFetching ? (
 		<main className="w-full h-screen flex flex-col gap-10 items-center justify-center bg-emerald-500">

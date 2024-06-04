@@ -14,7 +14,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const id = params.id;
 
-	const res = await fetch(`https://studyjom.nrmnqdds.com/api/note/${id}`);
+	const res = await fetch(`http://localhost:8282/api/note/${id}`);
 	const data = await res.json();
 
 	return {
@@ -28,9 +28,7 @@ const DynamicNotePage = async ({ params }: Props) => {
 	await queryClient.prefetchQuery({
 		queryKey: ["posts"],
 		queryFn: async () => {
-			const res = await fetch(
-				`https://studyjom.nrmnqdds.com/api/notes/${params.id}`,
-			);
+			const res = await fetch(`http://localhost:8282/api/notes/${params.id}`);
 			const json = await res.json();
 			return json.data;
 		},
