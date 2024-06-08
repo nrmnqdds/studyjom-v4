@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
 			.replace(/((^")|("$))/g, "")
 			.trim();
 
+		logger.info(`Chat response: ${chatResponse}`);
+
 		return NextResponse.json(
 			{
 				data: presignedURL,
@@ -102,6 +104,8 @@ export async function POST(request: NextRequest) {
 	)
 		.replace(/((^")|("$))/g, "")
 		.trim();
+
+	logger.info(`Chat response: ${chatResponse}`);
 
 	return NextResponse.json(
 		{

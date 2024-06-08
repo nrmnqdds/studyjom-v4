@@ -31,8 +31,7 @@
 		"bcryptjs": "^2.4.3",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
-		"drizzle-kit": "^0.22.1",
-		"drizzle-orm": "^0.31.0",
+		"drizzle-orm": "^0.31.2",
 		"drizzle-zod": "^0.5.1",
 		"framer-motion": "^11.2.10",
 		"got": "^14.3.0",
@@ -67,6 +66,7 @@
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
 		"@types/tough-cookie": "^4.0.5",
+		"drizzle-kit": "^0.22.5",
 		"postcss": "^8",
 		"tailwindcss": "^3.4.1",
 		"typescript": "^5"

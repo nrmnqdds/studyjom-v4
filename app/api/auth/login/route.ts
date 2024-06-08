@@ -19,20 +19,6 @@ const today = new Date().toISOString();
 export async function POST(request: NextRequest) {
 	const body = await request.json();
 
-	const userRedis = await redisClient.hgetall(`session-${body.username}`);
-
-	if (Object.keys(userRedis).length !== 0) {
-		logger.info("User is in redis. Proceed to use existing data.");
-		logger.info(userRedis);
-		return NextResponse.json(
-			{
-				data: userRedis,
-			},
-			{
-				status: 200,
-			},
-		);
-	}
 	const user = await db
 		.select()
 		.from(users)

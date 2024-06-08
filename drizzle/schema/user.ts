@@ -4,9 +4,11 @@ import {
 	boolean,
 	date,
 	integer,
+	json,
 	pgTable,
 	text,
 	varchar,
+	vector,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -34,7 +36,7 @@ export const notes = pgTable("notes", {
 	subject_name: text("subject_name").notNull(),
 	is_verified: boolean("is_verified").default(false),
 	file_url: text("file_url").notNull(),
-	file_content: text("file_content").notNull(),
+	embedding: vector("embedding", { dimensions: 768 }),
 	created_at: date("created_at")
 		.notNull()
 		.$defaultFn(() => new Date().toISOString()),
@@ -92,6 +94,7 @@ export const chatSessions = pgTable("chat_sessions", {
 	id: text("id").primaryKey().$defaultFn(createId),
 	user_id: text("user_id").notNull(),
 	note_id: text("note_id").notNull(),
+	history: json("history"),
 	created_at: date("created_at")
 		.notNull()
 		.$defaultFn(() => new Date().toISOString()),

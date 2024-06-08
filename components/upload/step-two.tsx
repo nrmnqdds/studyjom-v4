@@ -34,7 +34,7 @@ const UploadNoteSchema = z.object({
 const StepTwo = ({ files }: { files: File[] }) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const router = useRouter();
-	const { session, refetch } = useSession();
+	const { session } = useSession();
 
 	const form = useForm({
 		resolver: zodResolver(UploadNoteSchema),
@@ -60,17 +60,17 @@ const StepTwo = ({ files }: { files: File[] }) => {
 			const json = await res.json();
 			return json.data;
 		},
-		onSuccess: () => {
+		onSuccess: (data) => {
+			console.log("data: ", data);
 			setIsLoading(false);
 			toast.dismiss();
 			toast.success("Post created successfully");
-			refetch();
 			router.push("/browse");
 		},
-		onError: (error) => {
+		onError: (error: Error | string) => {
 			setIsLoading(false);
 			toast.dismiss();
-			console.log(error.message);
+			console.log(error.toString());
 			toast.error("Error creating post");
 		},
 	});

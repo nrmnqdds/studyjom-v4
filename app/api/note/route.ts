@@ -1,5 +1,6 @@
 import { db } from "@/drizzle";
 import { notes, users } from "@/drizzle/schema/user";
+import { genAI } from "@/lib/gemini";
 import { logger } from "@/lib/logger";
 import { eq, sql } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
@@ -7,6 +8,14 @@ import { type NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
 	const body = await request.json();
 	try {
+		// For embeddings, use the embedding-001 model
+		const model = genAI.getGenerativeModel({ model: "embedding-001" });
+
+		const result = await model.embedContent(body.fileContent);
+		const embedding = result.embedding;
+
+		logger.info(`Embedding: ${embedding.values}`);
+
 		const note = await db
 			.insert(notes)
 			.values({
@@ -15,7 +24,7 @@ export async function POST(request: NextRequest) {
 				subject_name: body.subjectName,
 				author_id: body.authorId,
 				file_url: body.fileURL,
-				file_content: body.fileContent,
+				embedding: embedding.values,
 				is_verified: false,
 			})
 			.returning({ returningId: notes.id });
@@ -37,7 +46,16 @@ export async function POST(request: NextRequest) {
 			},
 		);
 	} catch (err) {
+		if (err instanceof Error) {
+			logger.error(err.message);
+		}
+
+		if (typeof err === "string") {
+			logger.error(err);
+		}
+
 		logger.error(err);
+
 		return NextResponse.json(
 			{
 				error: "Failed to create note",

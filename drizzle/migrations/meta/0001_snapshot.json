@@ -1,9 +1,49 @@
 {
-  "id": "e2e2ba80-98d9-4b02-86ba-1a48c02fb71e",
-  "prevId": "d2a7e1b9-581b-4233-b4c5-dd87b685201b",
+  "id": "7739787d-54b4-47d6-abe2-dc520b8b91b6",
+  "prevId": "02662640-cffa-423d-a85e-24675783cf7c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.chat_sessions": {
+      "name": "chat_sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note_id": {
+          "name": "note_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "history": {
+          "name": "history",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.comments": {
       "name": "comments",
       "schema": "",
@@ -125,11 +165,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "file_content": {
-          "name": "file_content",
-          "type": "text",
+        "embedding": {
+          "name": "embedding",
+          "type": "vector(768)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
