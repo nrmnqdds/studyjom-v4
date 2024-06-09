@@ -75,7 +75,6 @@ const StepTwo = ({ files }: { files: File[] }) => {
 		},
 	});
 
-	// const uploadMutation = api.r2.upload.useMutation({
 	const uploadMutation = useMutation({
 		mutationKey: ["upload-to-r2"],
 		mutationFn: async () => {
