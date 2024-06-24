@@ -23,9 +23,13 @@ const envVariables = z.object({
 	NEXT_PUBLIC_R2_ACCESS_KEY_ID: z.string(),
 	NEXT_PUBLIC_R2_SECRET_ACCESS_KEY: z.string(),
 
+	// UMAMI
+	NEXT_PUBLIC_UMAMI_WEBSITE_ID: z.string(),
+
 	// NEXT_TELEMETRY_DISABLED
 	NEXT_TELEMETRY_DISABLED: z.coerce.number().int(),
 
+	// REDIS
 	REDIS_URL: z.string(),
 });
 

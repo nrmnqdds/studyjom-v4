@@ -62,8 +62,6 @@ export async function GET() {
 
 	const session = await redisClient.hgetall(namespace);
 
-	// const user = await db.select().from(users).where(eq(users.id, session.id));
-
 	if (!session || Object.keys(session).length === 0) {
 		cookies().delete("studyjom-session");
 		return NextResponse.json(

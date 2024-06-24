@@ -6,7 +6,6 @@ on:
       - "*"
   workflow_dispatch:
 
-
 jobs:
   push-store-image:
     runs-on: ubuntu-latest

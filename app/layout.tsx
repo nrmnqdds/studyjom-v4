@@ -3,6 +3,7 @@ import "./globals.css";
 import QueryProvider from "@/contexts/query-provider";
 import SessionProvider from "@/contexts/session-provider";
 import { Bricolage_Grotesque } from "next/font/google";
+import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 
 const bricolageGrotesk = Bricolage_Grotesque({
@@ -65,6 +66,11 @@ export default function RootLayout({
 						<Toaster />
 					</SessionProvider>
 				</QueryProvider>
+				<Script
+					defer
+					src="https://umami.studyjom.nrmnqdds.com/script.js"
+					data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+				/>
 			</body>
 		</html>
 	);
