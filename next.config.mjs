@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	output: "standalone",
-	swcMinify: true,
+	// Uncomment if deploy using Docker
+	// output: "standalone",
+	// swcMinify: true,
 
 	webpack: (config) => {
 		config.module.rules.push({
